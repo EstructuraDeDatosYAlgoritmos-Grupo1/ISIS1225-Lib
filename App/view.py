@@ -20,39 +20,95 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
-import config as cf
 import sys
-import controller
-from DISClib.ADT import list as lt
-assert cf
+import config
+import threading
+from App import controller
+from DISClib.ADT import stack
+assert config
+
+# ___________________________________________________
+#  Variables
+# ___________________________________________________
 
 
-"""
-La vista se encarga de la interacción con el usuario
-Presenta el menu de opciones y por cada seleccion
-se hace la solicitud al controlador para ejecutar la
-operación solicitada
-"""
+connectionsfile = 'connections.csv'
+countriesfile = 'countries.csv'
+LPfile = 'landing_points.csv'
+initialLP = None
+
+# ___________________________________________________
+#  Menu principal
+# ___________________________________________________
+
 
 def printMenu():
+    print("\n")
+    print("*******************************************")
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Inicializar Analizador")
+    print("2- Cargar información al analizador")
+    print("3- ")
+    print("4- ")
+    print("5- ")
+    print("6- ")
+    print("7- ")
+    print("0- Salir")
+    print("*******************************************")
 
-catalog = None
+
+
+def optionTwo(cont):
+    print("\nCargando información de transporte de singapur ....")
+    ### cargar datos
+    '''
+    numedges = controller.totalConnections(cont)
+    numvertex = controller.totalStops(cont)
+    print('Numero de vertices: ' + str(numvertex))
+    print('Numero de arcos: ' + str(numedges))
+    print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))'''
+
+
+
 
 """
 Menu principal
 """
-while True:
-    printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
-    if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
 
-    elif int(inputs[0]) == 2:
-        pass
+def thread_cycle():
+    while True:
+        printMenu()
+        inputs = input('Seleccione una opción para continuar\n>')
 
-    else:
-        sys.exit(0)
-sys.exit(0)
+        if int(inputs[0]) == 1:
+            print("\nInicializando....")
+            cont = controller.initAnalyzer()
+
+        elif int(inputs[0]) == 2:
+            optionTwo(cont)
+
+        elif int(inputs[0]) == 3:
+            pass
+
+        elif int(inputs[0]) == 4:
+            pass
+
+        elif int(inputs[0]) == 5:
+            pass
+
+        elif int(inputs[0]) == 6:
+            pass
+
+        elif int(inputs[0]) == 7:
+            pass
+
+        else:
+            sys.exit(0)
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    threading.stack_size(67108864)  # 64MB stack
+    sys.setrecursionlimit(2 ** 20)
+    thread = threading.Thread(target=thread_cycle)
+    thread.start()
