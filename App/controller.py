@@ -31,7 +31,7 @@ import csv
 # ___________________________________________________
 
 
-def init():
+def initAnalyzer():
     """
     Llama la funcion de inicializacion  del modelo.
     """
