@@ -26,7 +26,7 @@
 
 
 import config as cf
-import haversine as hs
+import math
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
@@ -124,8 +124,8 @@ def formatDistance(cable, analizer):
     destination = cable["destination"]
     coordinatesOrigin = getCoordinates(analizer, origin)
     coordinatesDestination = getCoordinates(analizer,destination)
-    
-
+    distance = haversine(coordinatesOrigin[0], coordinatesOrigin[1], coordinatesDestination[0], coordinatesDestination[1])
+    return distance
 
 
 def getCoordinates(analizer, place):
@@ -138,6 +138,26 @@ def getCoordinates(analizer, place):
     longitudePlace = float(longitudePlace["longitude"])
     return latitudePlace, longitudePlace
 
+def haversine(lat1, lon1, lat2, lon2):
+     
+    # distance between latitudes
+    # and longitudes
+    dLat = (lat2 - lat1) * math.pi / 180.0
+    dLon = (lon2 - lon1) * math.pi / 180.0
+ 
+    # convert to radians
+    lat1 = (lat1) * math.pi / 180.0
+    lat2 = (lat2) * math.pi / 180.0
+ 
+    # apply formulae
+    a = (pow(math.sin(dLat / 2), 2) +
+         pow(math.sin(dLon / 2), 2) *
+             math.cos(lat1) * math.cos(lat2))
+    rad = 6371
+    c = 2 * math.asin(math.sqrt(a))
+    return rad * c 
+    # This code is contributed
+    # by ChitraNayal
 
 # ==============================
 # Funciones de Comparacion
