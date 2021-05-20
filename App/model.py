@@ -37,9 +37,9 @@ from DISClib.Algorithms.Sorting import mergesort as merge
 from DISClib.Utils import error as error
 assert cf
 
-# -----------------------------------------------------
+# =====================================================
 #                       API
-# -----------------------------------------------------
+# =====================================================
 
 
 # Construccion de modelos
@@ -96,7 +96,7 @@ def addConnection(analyzer, cable):
         addVertex(analyzer, destination)
         addConnection(analyzer, origin, destination, distance)
 
-        #Crear funcion para cargar en 'cables'
+        #Crear funcion para cargar en 'cables' (tabla de hash), Key: cable_id, Value: capacityTBPS
 
 
         #Crear LpVertex
