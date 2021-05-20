@@ -26,7 +26,7 @@
 
 
 import config as cf
-
+import haversine as hs
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
@@ -48,12 +48,17 @@ def newAnalyzer():
     try:
         analyzer = {
                     'cables': None,
+                    "landingPoints":None,
                     'connections': None,
                     'components': None,
                     'paths': None
                     }
 
         analyzer['cables'] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=compareLandingPointIds)
+                                     
+        analyzer["landingPoints"] = mp.newMap(numelements=14000,
                                      maptype='PROBING',
                                      comparefunction=compareLandingPointIds)
 
@@ -114,8 +119,25 @@ def formatVertexDestination(cable):
     name = name + cable["cable_id"]
     return name
 
-def formatDistance(cable):
-    distance = cable["cable_length"]
+def formatDistance(cable, analizer):
+    origin = cable["origin"]
+    destination = cable["destination"]
+    coordinatesOrigin = getCoordinates(analizer, origin)
+    coordinatesDestination = getCoordinates(analizer,destination)
+    
+
+
+
+def getCoordinates(analizer, place):
+    latitudePlace = mp.get(analizer["landingPoints"], place)
+    latitudePlace = me.getValue(latitudePlace)
+    latitudePlace = float(latitudePlace["latitude"])
+
+    longitudePlace = mp.get(analizer["landingPoints"], place)
+    longitudePlace = me.getValue(longitudePlace)
+    longitudePlace = float(longitudePlace["longitude"])
+    return latitudePlace, longitudePlace
+
 
 # ==============================
 # Funciones de Comparacion
