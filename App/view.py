@@ -21,7 +21,7 @@
  """
 
 import sys
-import config
+from App import config
 import threading
 from App import controller
 from DISClib.ADT import stack

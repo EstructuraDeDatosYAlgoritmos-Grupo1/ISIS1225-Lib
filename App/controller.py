@@ -20,8 +20,8 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
-import config as cf
-import model
+from App import config as cf
+from App import model
 import csv
 
 

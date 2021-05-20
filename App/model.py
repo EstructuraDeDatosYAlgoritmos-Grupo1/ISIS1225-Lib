@@ -25,7 +25,7 @@
  """
 
 
-import config as cf
+from App import config as cf
 import math
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as mp
@@ -45,16 +45,22 @@ assert cf
 # Construccion de modelos
 
 def newAnalyzer():
+
     try:
         analyzer = {
-                    'cables': None,
+                    'cables' : None,
+                    'lpVertex' : None,
                     "landingPoints":None,
                     'connections': None,
                     'components': None,
-                    'paths': None
+                    'paths' : None
                     }
 
         analyzer['cables'] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=compareLandingPointIds)
+
+        analyzer['lpVertex'] = mp.newMap(numelements=14000,
                                      maptype='PROBING',
                                      comparefunction=compareLandingPointIds)
                                      
@@ -66,6 +72,7 @@ def newAnalyzer():
                                               directed=False,
                                               size=14000,
                                               comparefunction=compareLandingPointIds)
+
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -91,7 +98,9 @@ def addConnection(analyzer, cable):
 
         #Crear funcion para cargar en 'cables'
 
+
         #Crear LpVertex
+
 
         return analyzer
     except Exception as exp:
