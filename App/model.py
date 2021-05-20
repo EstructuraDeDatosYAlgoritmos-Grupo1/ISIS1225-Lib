@@ -72,7 +72,7 @@ def newAnalyzer():
 
 # Funciones para agregar informacion al grafo
 
-def addStopConnection(analyzer, cable):
+def addConnection(analyzer, cable):
     """
     Adiciona los landing points al grafo como vertices y arcos entre los landing points adyacentes.
 
@@ -93,6 +93,12 @@ def addStopConnection(analyzer, cable):
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:addStopConnection')
+
+# Funciones para agregar informacion a una tabla de hash
+
+def addLP(analyzer, point):
+    mp.put(analyzer["landingPoints"],point["landing_point_id"], point)
+    return analyzer
 
 # ==============================
 # Funciones de consulta

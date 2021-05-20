@@ -45,7 +45,7 @@ def init():
 #  de datos en los modelos
 # ___________________________________________________
 
-def loadServices(analyzer, servicesfile):
+def loadServices(analyzer, LPfile, connectionsfile):
     """
     Carga los datos de los archivos CSV en el modelo.
     Se crea un arco entre cada par de estaciones que
@@ -54,20 +54,17 @@ def loadServices(analyzer, servicesfile):
     addRouteConnection crea conexiones entre diferentes rutas
     servidas en una misma estación.
     """
-    servicesfile = cf.data_dir + servicesfile
-    input_file = csv.DictReader(open(servicesfile, encoding="utf-8"),
-                                delimiter=",")
-    lastservice = None
-    for service in input_file:
-        if lastservice is not None:
-            sameservice = lastservice['ServiceNo'] == service['ServiceNo']
-            samedirection = lastservice['Direction'] == service['Direction']
-            samebusStop = lastservice['BusStopCode'] == service['BusStopCode']
-            if sameservice and samedirection and not samebusStop:
-                model.addStopConnection(analyzer, lastservice, service)
-        lastservice = service
-    model.addRouteConnections(analyzer)
+    LPfile = cf.data_dir + LPfile
+    LPDict = csv.DictReader(open(LPfile, encoding="utf-8"), delimiter=",")
+    connectionsfile = cf.data_dir + connectionsfile
+    connectionsDict = csv.DictReader(open(connectionsfile, encoding="utf-8"), delimiter=",")
+
+    for point in LPDict:
+        model.addLP(analyzer, point)
+    for cable in connectionsDict:
+        model.addConnection(analyzer, cable)
     return analyzer
+
 
 # Funciones de ordenamiento
 
