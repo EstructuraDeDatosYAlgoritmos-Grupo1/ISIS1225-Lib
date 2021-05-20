@@ -85,8 +85,8 @@ def addStopConnection(analyzer, cable):
 
         distance = formatDistance(cable)
         
-        addStop(analyzer, origin)
-        addStop(analyzer, destination)
+        addVertex(analyzer, origin)
+        addVertex(analyzer, destination)
         addConnection(analyzer, origin, destination, distance)
         addRouteStop(analyzer, service)
         addRouteStop(analyzer, lastservice)
@@ -101,9 +101,6 @@ def addStopConnection(analyzer, cable):
 # ==============================
 # Funciones Helper
 # ==============================
-
-
-
 
 def formatVertexOrigin(cable):
     """
@@ -158,6 +155,23 @@ def haversine(lat1, lon1, lat2, lon2):
     return rad * c 
     # This code is contributed
     # by ChitraNayal
+
+def addVertex(analyzer, vertexid):
+    try:
+        if not gr.containsVertex(analyzer['connections'], vertexid):
+            gr.insertVertex(analyzer['connections'], vertexid)
+        return analyzer
+    except Exception as exp:
+        error.reraise(exp, 'model:addstop')
+
+def addConnection(analyzer, origin, destination, distance):
+    """
+    Adiciona un arco entre dos estaciones
+    """
+    edge = gr.getEdge(analyzer['connections'], origin, destination)
+    if edge is None:
+        gr.addEdge(analyzer['connections'], origin, destination, distance)
+    return analyzer
 
 # ==============================
 # Funciones de Comparacion
