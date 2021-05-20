@@ -63,7 +63,7 @@ def newAnalyzer():
                                      comparefunction=compareLandingPointIds)
 
         analyzer['connections'] = gr.newGraph(datastructure='ADJ_LIST',
-                                              directed=True,
+                                              directed=False,
                                               size=14000,
                                               comparefunction=compareLandingPointIds)
         return analyzer
@@ -82,14 +82,17 @@ def addConnection(analyzer, cable):
     try:
         origin = formatVertexOrigin(cable)
         destination = formatVertexDestination(cable)
-
+        
         distance = formatDistance(cable)
         
         addVertex(analyzer, origin)
         addVertex(analyzer, destination)
         addConnection(analyzer, origin, destination, distance)
-        addRouteStop(analyzer, service)
-        addRouteStop(analyzer, lastservice)
+
+        #Crear funcion para cargar en 'cables'
+
+        #Crear LpVertex
+
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:addStopConnection')
@@ -109,10 +112,6 @@ def addLP(analyzer, point):
 # ==============================
 
 def formatVertexOrigin(cable):
-    """
-    Se formatea el nombrer del vertice con el id de la estación
-    seguido de la ruta.
-    """
     name = cable['origin'] + '-'
     name = name + cable['cable_id']
     return name
