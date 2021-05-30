@@ -96,10 +96,9 @@ def addConnection(analyzer, cable):
         addVertex(analyzer, destination)
         addConnection(analyzer, origin, destination, distance)
 
-        #Crear funcion para cargar en 'cables' (tabla de hash), Key: cable_id, Value: capacityTBPS
+        addCable(analyzer,cable)
 
-
-        #Crear LpVertex
+        #Crear LpVertex key: lpid   value: lt -> vertices con ese lp
 
 
         return analyzer
@@ -111,6 +110,12 @@ def addConnection(analyzer, cable):
 def addLP(analyzer, point):
     mp.put(analyzer["landingPoints"],point["landing_point_id"], point)
     return analyzer
+
+def addCable(analyzer,cable):
+    existsCable = mp.get(analyzer["cables"], cable["cable_id"])
+    if existsCable == None:
+        mp.put(analyzer["cables"], cable["cable_id"], cable["capacityTBPS"])
+    
 
 # ==============================
 # Funciones de consulta
