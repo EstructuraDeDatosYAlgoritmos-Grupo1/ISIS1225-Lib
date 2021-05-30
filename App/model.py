@@ -49,7 +49,7 @@ def newAnalyzer():
     try:
         analyzer = {
                     'cables' : None,
-                    'lpVertex' : None,
+                    'lpVertices' : None,
                     "landingPoints":None,
                     'connections': None,
                     'components': None,
@@ -98,8 +98,11 @@ def addConnection(analyzer, cable):
 
         addCable(analyzer,cable)
 
-        #Crear LpVertex key: lpid   value: lt -> vertices con ese lp
+        addLpVertices(analyzer, cable, "origin", origin)
+        addLpVertices(analyzer, cable, "destination", destination)
 
+        #crear una funcion que conecte vertices que tengan el mismo lp - esta funcion va a usar la lista que se encuentra en el lpvertices
+        addLpConnections(analyzer)
 
         return analyzer
     except Exception as exp:
@@ -155,7 +158,6 @@ def getCoordinates(analizer, place):
     return latitudePlace, longitudePlace
 
 def haversine(lat1, lon1, lat2, lon2):
-     
     # distance between latitudes
     # and longitudes
     dLat = (lat2 - lat1) * math.pi / 180.0
@@ -191,6 +193,15 @@ def addConnection(analyzer, origin, destination, distance):
     if edge is None:
         gr.addEdge(analyzer['connections'], origin, destination, distance)
     return analyzer
+
+def addLpVertices(analyzer, cable, type, vertex):
+    existsEntry = mp.get(analyzer["lpVertices"], cable[type])
+    if existsEntry == None:
+        dataentry = lt.newList('ARRAY_LIST', compareLandingPointIds)
+        mp.put(analyzer["lpVertices"],cable[type], dataentry)
+    else:
+        dataentry = me.getValue(existsEntry)
+    lt.addLast(dataentry, vertex)
 
 # ==============================
 # Funciones de Comparacion
