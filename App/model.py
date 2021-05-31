@@ -60,7 +60,7 @@ def newAnalyzer():
                                      maptype='PROBING',
                                      comparefunction=compareLandingPointIds)
 
-        analyzer['lpVertex'] = mp.newMap(numelements=14000,
+        analyzer['lpVertices'] = mp.newMap(numelements=14000,
                                      maptype='PROBING',
                                      comparefunction=compareLandingPointIds)
                                      
@@ -79,7 +79,7 @@ def newAnalyzer():
 
 # Funciones para agregar informacion al grafo
 
-def addConnection(analyzer, cable):
+def addConnections(analyzer, cable):
     """
     Adiciona los landing points al grafo como vertices y arcos entre los landing points adyacentes.
 
@@ -101,9 +101,8 @@ def addConnection(analyzer, cable):
         addLpVertices(analyzer, cable, "origin", origin)
         addLpVertices(analyzer, cable, "destination", destination)
 
-        #crear una funcion que conecte vertices que tengan el mismo lp - esta funcion va a usar la lista que se encuentra en el lpvertices
         addLpConnections(analyzer)
-
+        
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:addStopConnection')
@@ -186,9 +185,6 @@ def addVertex(analyzer, vertexid):
         error.reraise(exp, 'model:addstop')
 
 def addConnection(analyzer, origin, destination, distance):
-    """
-    Adiciona un arco entre dos estaciones
-    """
     edge = gr.getEdge(analyzer['connections'], origin, destination)
     if edge is None:
         gr.addEdge(analyzer['connections'], origin, destination, distance)
@@ -202,6 +198,17 @@ def addLpVertices(analyzer, cable, type, vertex):
     else:
         dataentry = me.getValue(existsEntry)
     lt.addLast(dataentry, vertex)
+
+def addLpConnections(analyzer):
+    distance = 0.1
+    LpList = mp.keySet(analyzer["lpVerices"])
+    for Lp in lt.iterator(LpList):
+        vertexList = me.getValue(mp.get(Lp))
+        for vertexOrigin in lt.iterator(vertexList):
+            for vertexDestination in lt.iterator(vertexList):
+                if gr.getEdge(analyzer["connections"], vertexOrigin, vertexDestination) == None and vertexOrigin != vertexDestination:
+                    addConnection(analyzer, vertexOrigin, vertexDestination, distance)
+    
 
 # ==============================
 # Funciones de Comparacion
