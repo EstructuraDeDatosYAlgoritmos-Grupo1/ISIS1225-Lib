@@ -86,26 +86,25 @@ def addConnections(analyzer, cable):
     Los vertices tienen por nombre el identificador del landing point
     seguido del cable que sirve.
     """
-    try:
-        origin = formatVertexOrigin(cable)
-        destination = formatVertexDestination(cable)
-        
-        distance = formatDistance(cable)
-        
-        addVertex(analyzer, origin)
-        addVertex(analyzer, destination)
-        addConnection(analyzer, origin, destination, distance)
+    
+    origin = formatVertexOrigin(cable)
+    destination = formatVertexDestination(cable)
+    
+    distance = formatDistance(cable, analyzer)
+    
+    addVertex(analyzer, origin)
+    addVertex(analyzer, destination)
+    addConnection(analyzer, origin, destination, distance)
 
-        addCable(analyzer,cable)
+    addCable(analyzer,cable)
 
-        addLpVertices(analyzer, cable, "origin", origin)
-        addLpVertices(analyzer, cable, "destination", destination)
+    addLpVertices(analyzer, cable, "origin", origin)
+    addLpVertices(analyzer, cable, "destination", destination)
 
-        addLpConnections(analyzer)
-        
-        return analyzer
-    except Exception as exp:
-        error.reraise(exp, 'model:addStopConnection')
+    addLpConnections(analyzer)
+    
+    return analyzer
+    
 
 # Funciones para agregar informacion a una tabla de hash
 
@@ -123,35 +122,42 @@ def addCable(analyzer,cable):
 # Funciones de consulta
 # ==============================
 
+def totalVertices(analyzer):
+    return gr.numVertices(analyzer['connections'])
+
+
+def totalConnections(analyzer):
+    return gr.numEdges(analyzer['connections'])
+
 # ==============================
 # Funciones Helper
 # ==============================
 
 def formatVertexOrigin(cable):
-    name = cable['origin'] + '-'
-    name = name + cable['cable_id']
+    name = str(cable['origin']) + '-'
+    name = name + str(cable['cable_id'])
     return name
 
 def formatVertexDestination(cable):
-    name = cable["destination"] + '-'
-    name = name + cable["cable_id"]
+    name = str(cable["destination"]) + '-'
+    name = name + str(cable["cable_id"])
     return name
 
-def formatDistance(cable, analizer):
+def formatDistance(cable, analyzer):
     origin = cable["origin"]
     destination = cable["destination"]
-    coordinatesOrigin = getCoordinates(analizer, origin)
-    coordinatesDestination = getCoordinates(analizer,destination)
+    coordinatesOrigin = getCoordinates(analyzer, origin)
+    coordinatesDestination = getCoordinates(analyzer,destination)
     distance = haversine(coordinatesOrigin[0], coordinatesOrigin[1], coordinatesDestination[0], coordinatesDestination[1])
     return distance
 
 
-def getCoordinates(analizer, place):
-    latitudePlace = mp.get(analizer["landingPoints"], place)
+def getCoordinates(analyzer, place):
+    latitudePlace = mp.get(analyzer["landingPoints"], place)
     latitudePlace = me.getValue(latitudePlace)
     latitudePlace = float(latitudePlace["latitude"])
 
-    longitudePlace = mp.get(analizer["landingPoints"], place)
+    longitudePlace = mp.get(analyzer["landingPoints"], place)
     longitudePlace = me.getValue(longitudePlace)
     longitudePlace = float(longitudePlace["longitude"])
     return latitudePlace, longitudePlace
@@ -177,12 +183,9 @@ def haversine(lat1, lon1, lat2, lon2):
     # by ChitraNayal
 
 def addVertex(analyzer, vertexid):
-    try:
-        if not gr.containsVertex(analyzer['connections'], vertexid):
-            gr.insertVertex(analyzer['connections'], vertexid)
-        return analyzer
-    except Exception as exp:
-        error.reraise(exp, 'model:addstop')
+    if not gr.containsVertex(analyzer['connections'], vertexid):
+        gr.insertVertex(analyzer['connections'], vertexid)
+    return analyzer
 
 def addConnection(analyzer, origin, destination, distance):
     edge = gr.getEdge(analyzer['connections'], origin, destination)

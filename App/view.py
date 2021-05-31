@@ -21,7 +21,7 @@
  """
 
 import sys
-from App import config
+import config
 import threading
 from App import controller
 from DISClib.ADT import stack
@@ -58,15 +58,14 @@ def printMenu():
 
 
 
-def optionTwo(cont):
-    print("\nCargando información de transporte de singapur ....")
-    ### cargar datos
-    '''
-    numedges = controller.totalConnections(cont)
-    numvertex = controller.totalStops(cont)
+def optionTwo(analyzer):
+    print("\nCargando información....")
+    controller.loadCables(analyzer, LPfile, connectionsfile)
+    numedges = controller.totalConnections(analyzer)
+    numvertex = controller.totalVertices(analyzer)
     print('Numero de vertices: ' + str(numvertex))
     print('Numero de arcos: ' + str(numedges))
-    print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))'''
+    print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
 
 
 
@@ -82,10 +81,10 @@ def thread_cycle():
 
         if int(inputs[0]) == 1:
             print("\nInicializando....")
-            cont = controller.initAnalyzer()
+            analyzer = controller.initAnalyzer()
 
         elif int(inputs[0]) == 2:
-            optionTwo(cont)
+            optionTwo(analyzer)
 
         elif int(inputs[0]) == 3:
             pass

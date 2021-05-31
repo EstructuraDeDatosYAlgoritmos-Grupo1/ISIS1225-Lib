@@ -45,26 +45,23 @@ def initAnalyzer():
 #  de datos en los modelos
 # ___________________________________________________
 
-def loadServices(analyzer, LPfile, connectionsfile):
-    """
-    Carga los datos de los archivos CSV en el modelo.
-    Se crea un arco entre cada par de estaciones que
-    pertenecen al mismo servicio y van en el mismo sentido.
-
-    addRouteConnection crea conexiones entre diferentes rutas
-    servidas en una misma estación.
-    """
+def loadCables(analyzer, LPfile, connectionsfile):
     LPfile = cf.data_dir + LPfile
-    LPDict = csv.DictReader(open(LPfile, encoding="utf-8"), delimiter=",")
+    LPDict = csv.DictReader(open(LPfile, encoding= "utf-8"), delimiter=",")
     connectionsfile = cf.data_dir + connectionsfile
     connectionsDict = csv.DictReader(open(connectionsfile, encoding="utf-8"), delimiter=",")
 
     for point in LPDict:
         model.addLP(analyzer, point)
     for cable in connectionsDict:
-        model.addConnection(analyzer, cable)
+        model.addConnections(analyzer, cable)
     return analyzer
 
+def totalVertices(analyzer):
+    return model.totalStops(analyzer)
+
+def totalConnections(analyzer):
+    return model.totalConnections(analyzer)
 
 # Funciones de ordenamiento
 
