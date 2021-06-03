@@ -98,10 +98,11 @@ def addConnections(analyzer, cable):
 
     addCable(analyzer,cable)
 
-    addLpVertices(analyzer, cable, "origin", origin)
+    addLpVertices(analyzer, cable, "\ufefforigin", origin)
     addLpVertices(analyzer, cable, "destination", destination)
 
-    addLpConnections(analyzer)
+
+    #addLpConnections(analyzer)
     
     return analyzer
     
@@ -110,6 +111,7 @@ def addConnections(analyzer, cable):
 
 def addLP(analyzer, point):
     mp.put(analyzer["landingPoints"],point["landing_point_id"], point)
+
     return analyzer
 
 def addCable(analyzer,cable):
@@ -125,16 +127,39 @@ def addCable(analyzer,cable):
 def totalVertices(analyzer):
     return gr.numVertices(analyzer['connections'])
 
-
 def totalConnections(analyzer):
     return gr.numEdges(analyzer['connections'])
+
+def connectedComponents(analyzer):
+    analyzer['components'] = scc.KosarajuSCC(analyzer['connections'])
+    return scc.connectedComponents(analyzer['components'])
+
+def areConnected(analyzer, lp1, lp2):
+    analyzer['paths'] = djk.Dijkstra(analyzer['connections'], lp1)
+    lp1HasPath = djk.hasPathTo(analyzer['paths'], lp2)
+    analyzer['paths'] = djk.Dijkstra(analyzer['connections'], lp2)
+    lp2HasPath = djk.hasPathTo(analyzer['paths'], lp1)
+    if lp1HasPath and lp2HasPath:
+        return 1
+    else:
+        return 0
+
+def areConnectedLP(analyzer, lp1,lp2):
+    listLp1 = me.getValue(mp.get(analyzer['lpVertices'], lp1))
+    listLp2 = me.getValue(mp.get(analyzer['lpVertices'], lp2))
+    for vertex in lt.iterator(listLp1):
+        for vertex1 in lt.iterator(listLp2):
+            if areConnected(analyzer, vertex, vertex1) == 1:
+                return 1
+                break
+    return 0
 
 # ==============================
 # Funciones Helper
 # ==============================
 
 def formatVertexOrigin(cable):
-    name = str(cable['origin']) + '-'
+    name = str(cable['\ufefforigin']) + '-'
     name = name + str(cable['cable_id'])
     return name
 
@@ -144,7 +169,7 @@ def formatVertexDestination(cable):
     return name
 
 def formatDistance(cable, analyzer):
-    origin = cable["origin"]
+    origin = cable["\ufefforigin"]
     destination = cable["destination"]
     coordinatesOrigin = getCoordinates(analyzer, origin)
     coordinatesDestination = getCoordinates(analyzer,destination)
@@ -204,9 +229,9 @@ def addLpVertices(analyzer, cable, type, vertex):
 
 def addLpConnections(analyzer):
     distance = 0.1
-    LpList = mp.keySet(analyzer["lpVerices"])
+    LpList = mp.keySet(analyzer["lpVertices"])
     for Lp in lt.iterator(LpList):
-        vertexList = me.getValue(mp.get(Lp))
+        vertexList = me.getValue(mp.get(analyzer["lpVertices"],Lp))
         for vertexOrigin in lt.iterator(vertexList):
             for vertexDestination in lt.iterator(vertexList):
                 if gr.getEdge(analyzer["connections"], vertexOrigin, vertexDestination) == None and vertexOrigin != vertexDestination:

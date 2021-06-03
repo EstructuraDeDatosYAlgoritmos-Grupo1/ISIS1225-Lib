@@ -48,7 +48,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Analizador")
     print("2- Cargar información al analizador")
-    print("3- ")
+    print("3- Identificar clusteres de comunicacion")
     print("4- ")
     print("5- ")
     print("6- ")
@@ -67,6 +67,13 @@ def optionTwo(analyzer):
     print('Numero de arcos: ' + str(numedges))
     print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
 
+def optionThree(analyzer, lp1, lp2):
+    print("\nEl número de componentes conectados es: " + str(controller.connectedComponents(analyzer)))
+    if controller.areConnectedLP(analyzer, lp1, lp2) == 1:  
+       print("\nLos landing points "+ str(lp1) + " y " + str(lp2) + " están conectados ")
+    else:
+       print("\nLos landing points "+ str(lp1) + " y " + str(lp2) + " no están conectados ")
+    
 
 
 
@@ -87,7 +94,10 @@ def thread_cycle():
             optionTwo(analyzer)
 
         elif int(inputs[0]) == 3:
-            pass
+            print("Ingrese dos landing points para saber si están conectados....")
+            lp1 = input('Ingrese el id de un landing point: ')
+            lp2 = input('Ingrese el id de otro landing point: ')
+            optionThree(analyzer, lp1, lp2)
 
         elif int(inputs[0]) == 4:
             pass

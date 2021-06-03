@@ -58,7 +58,7 @@ def loadCables(analyzer, LPfile, connectionsfile):
     return analyzer
 
 def totalVertices(analyzer):
-    return model.totalStops(analyzer)
+    return model.totalVertices(analyzer)
 
 def totalConnections(analyzer):
     return model.totalConnections(analyzer)
@@ -66,3 +66,10 @@ def totalConnections(analyzer):
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def connectedComponents(analyzer):
+    return model.connectedComponents(analyzer)
+
+
+def areConnectedLP(analyzer, lp1, lp2):
+    return model.areConnectedLP(analyzer, lp1, lp2)
