@@ -154,6 +154,32 @@ def areConnectedLP(analyzer, lp1,lp2):
                 break
     return 0
 
+def criticalPoints(analyzer):
+    criticalPoint = None
+    max = 0
+    keyCritical = 0
+    keys = mp.keySet(analyzer['lpVertices'])
+    for key in lt.iterator(keys):
+       value = me.getValue(mp.get(analyzer['lpVertices'], key))
+       setVal = set(value['elements'])
+       lstVal = list(setVal)
+       lstAux = lt.newList('ARRAY_LIST', compareLandingPointIds)
+       for element in lstVal:
+            lt.addLast(lstAux, element)
+       size = lt.size(lstAux)
+
+       if size > max :
+          max = size
+          criticalPoint = me.getValue(mp.get(analyzer['landingPoints'], key))
+          keyCritical = key
+
+    print('\n El landing point con mas cables conectados es: \n' )      
+    
+    print('ID: '+ str(keyCritical) + ' Nombre: ' + str(criticalPoint['id']) + ' Ubicación: ' 
+          + str(criticalPoint['name']) + ' Cantidad de cables conectados:  ' + str(max)  )
+
+    return criticalPoint
+
 # ==============================
 # Funciones Helper
 # ==============================

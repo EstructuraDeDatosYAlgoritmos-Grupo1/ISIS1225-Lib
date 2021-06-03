@@ -73,3 +73,6 @@ def connectedComponents(analyzer):
 
 def areConnectedLP(analyzer, lp1, lp2):
     return model.areConnectedLP(analyzer, lp1, lp2)
+
+def criticalPoints(analyzer):
+    return model.criticalPoints(analyzer)

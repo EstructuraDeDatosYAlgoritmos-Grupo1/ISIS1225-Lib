@@ -49,7 +49,7 @@ def printMenu():
     print("1- Inicializar Analizador")
     print("2- Cargar información al analizador")
     print("3- Identificar clusteres de comunicacion")
-    print("4- ")
+    print("4- Encontrar los landing points que sirven como punto de interconexión")
     print("5- ")
     print("6- ")
     print("7- ")
@@ -73,7 +73,11 @@ def optionThree(analyzer, lp1, lp2):
        print("\nLos landing points "+ str(lp1) + " y " + str(lp2) + " están conectados ")
     else:
        print("\nLos landing points "+ str(lp1) + " y " + str(lp2) + " no están conectados ")
-    
+
+def optionFour(analyzer):
+    return controller.criticalPoints(analyzer)
+   
+
 
 
 
@@ -100,7 +104,8 @@ def thread_cycle():
             optionThree(analyzer, lp1, lp2)
 
         elif int(inputs[0]) == 4:
-            pass
+           optionFour(analyzer)
+            
 
         elif int(inputs[0]) == 5:
             pass
