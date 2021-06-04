@@ -50,7 +50,7 @@ def printMenu():
     print("2- Cargar información al analizador")
     print("3- Identificar clusteres de comunicacion")
     print("4- Encontrar los landing points que sirven como punto de interconexión")
-    print("5- ")
+    print("5- Encontrar ruta mínima entre países")
     print("6- ")
     print("7- ")
     print("0- Salir")
@@ -60,7 +60,7 @@ def printMenu():
 
 def optionTwo(analyzer):
     print("\nCargando información....")
-    controller.loadCables(analyzer, LPfile, connectionsfile)
+    controller.loadCables(analyzer, LPfile, connectionsfile, countriesfile)
     numedges = controller.totalConnections(analyzer)
     numvertex = controller.totalVertices(analyzer)
     print('Numero de vertices: ' + str(numvertex))
@@ -76,6 +76,9 @@ def optionThree(analyzer, lp1, lp2):
 
 def optionFour(analyzer):
     return controller.criticalPoints(analyzer)
+
+def optionFive(analyzer, p1,p2):
+    return controller.getMinimumDistance(analyzer, p1,p2)
    
 
 
@@ -98,7 +101,7 @@ def thread_cycle():
             optionTwo(analyzer)
 
         elif int(inputs[0]) == 3:
-            print("Ingrese dos landing points para saber si están conectados....")
+            print("Ingrese los landing points que desea evaluar: ")
             lp1 = input('Ingrese el id de un landing point: ')
             lp2 = input('Ingrese el id de otro landing point: ')
             optionThree(analyzer, lp1, lp2)
@@ -106,12 +109,14 @@ def thread_cycle():
         elif int(inputs[0]) == 4:
            optionFour(analyzer)
             
-
         elif int(inputs[0]) == 5:
-            pass
+            print("Ingrese los países que desea evaluar ")
+            p1 = input('Ingrese el nombre del primer país: ')
+            p2 = input('Ingrese el nombre del segundo país: ')
+            optionFive(analyzer, p1,p2)
 
         elif int(inputs[0]) == 6:
-            pass
+            return controller.op1(analyzer)
 
         elif int(inputs[0]) == 7:
             pass

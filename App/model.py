@@ -53,7 +53,8 @@ def newAnalyzer():
                     "landingPoints":None,
                     'connections': None,
                     'components': None,
-                    'paths' : None
+                    'paths' : None,
+                    'countries': None
                     }
 
         analyzer['cables'] = mp.newMap(numelements=14000,
@@ -65,6 +66,10 @@ def newAnalyzer():
                                      comparefunction=compareLandingPointIds)
                                      
         analyzer["landingPoints"] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=compareLandingPointIds)
+
+        analyzer["countries"] = mp.newMap(numelements=14000,
                                      maptype='PROBING',
                                      comparefunction=compareLandingPointIds)
 
@@ -105,6 +110,8 @@ def addConnections(analyzer, cable):
     #addLpConnections(analyzer)
     
     return analyzer
+
+    
     
 
 # Funciones para agregar informacion a una tabla de hash
@@ -118,6 +125,31 @@ def addCable(analyzer,cable):
     existsCable = mp.get(analyzer["cables"], cable["cable_id"])
     if existsCable == None:
         mp.put(analyzer["cables"], cable["cable_id"], cable["capacityTBPS"])
+
+def addCountries(analyzer, country):
+    mp.put(analyzer["countries"],country["CountryName"], country)
+
+def addLPToCapital(analyzer, country):
+    vertexid = str(country['Internet users'])+'-'+ str(country['CountryCode'])
+    if not gr.containsVertex(analyzer['connections'], vertexid):
+       gr.insertVertex(analyzer['connections'], vertexid)
+    keys = mp.keySet(analyzer["landingPoints"])
+    for key in lt.iterator(keys):
+        name = (me.getValue(mp.get(analyzer["landingPoints"],key)))['name']
+        if country['CountryName'] in name:
+            destinationName = str(key) + '-' + str(country['CountryCode'])
+            if not gr.containsVertex(analyzer['connections'], destinationName):
+                gr.insertVertex(analyzer['connections'], destinationName)
+            existsEntry = mp.get(analyzer["lpVertices"], key)
+            dataentry = me.getValue(existsEntry)
+            lt.addLast(dataentry, destinationName)
+            origin = getCapitalCityCoordenates(analyzer, country)
+            destination = getCoordinates(analyzer, key)
+            distance = haversine(origin[0], origin[1], destination[0], destination[1])
+            addConnection(analyzer, vertexid, destinationName, distance)
+
+    return analyzer
+    
     
 
 # ==============================
@@ -161,24 +193,43 @@ def criticalPoints(analyzer):
     keys = mp.keySet(analyzer['lpVertices'])
     for key in lt.iterator(keys):
        value = me.getValue(mp.get(analyzer['lpVertices'], key))
-       setVal = set(value['elements'])
-       lstVal = list(setVal)
+       lstVal = list(set(value['elements']))
        lstAux = lt.newList('ARRAY_LIST', compareLandingPointIds)
        for element in lstVal:
             lt.addLast(lstAux, element)
        size = lt.size(lstAux)
-
        if size > max :
           max = size
           criticalPoint = me.getValue(mp.get(analyzer['landingPoints'], key))
           keyCritical = key
-
     print('\n El landing point con mas cables conectados es: \n' )      
-    
     print('ID: '+ str(keyCritical) + ' Nombre: ' + str(criticalPoint['id']) + ' Ubicación: ' 
-          + str(criticalPoint['name']) + ' Cantidad de cables conectados:  ' + str(max)  )
-
+          + str(criticalPoint['name']) + ' Cantidad de cables conectados:  ' + str(max))
     return criticalPoint
+
+def getMinimumDistance(analyzer, p1,p2):
+    c1 = me.getValue(mp.get(analyzer['countries'],p1))
+    c2 = me.getValue(mp.get(analyzer['countries'],p2))
+    v1 = str(c1['Internet users'])+'-'+ str(c1['CountryCode'])
+    v2 = str(c2['Internet users'])+'-'+ str(c2['CountryCode'])
+    analyzer['paths'] = djk.Dijkstra(analyzer['connections'], v1)
+    path = djk.pathTo(analyzer['paths'], v2)
+    sum = 0
+    print('\n')
+    for element in lt.iterator(path):
+      print('De '+ str(element['vertexA'])+ ' a '+ str(element['vertexB']) + ' distancia: '+ str(element['weight']))
+      sum = sum + element['weight']
+    print('\n Distancia total de la ruta: '+ str(sum)+'\n')
+
+    return path
+
+def getCapitalCityCoordenates(analyzer, country):
+    latitude = float(country['CapitalLatitude'])
+    longitude = float(country ['CapitalLongitude'])
+    return latitude, longitude
+    
+
+
 
 # ==============================
 # Funciones Helper
@@ -259,9 +310,9 @@ def addLpConnections(analyzer):
     for Lp in lt.iterator(LpList):
         vertexList = me.getValue(mp.get(analyzer["lpVertices"],Lp))
         for vertexOrigin in lt.iterator(vertexList):
-            for vertexDestination in lt.iterator(vertexList):
-                if gr.getEdge(analyzer["connections"], vertexOrigin, vertexDestination) == None and vertexOrigin != vertexDestination:
-                    addConnection(analyzer, vertexOrigin, vertexDestination, distance)
+          for vertexDestination in lt.iterator(vertexList):
+            if gr.getEdge(analyzer["connections"], vertexOrigin, vertexDestination) == None and vertexOrigin != vertexDestination:
+                 addConnection(analyzer, vertexOrigin, vertexDestination, distance)
     
 
 # ==============================
@@ -279,3 +330,10 @@ def compareLandingPointIds(stop, keyValueLP):
         return 1
     else:
         return -1
+
+
+def op1(analyzer):
+    sete = gr.containsVertex(analyzer['connections'],'3316-2africa')
+    print(sete)
+    print(gr.containsVertex(analyzer['connections'],'19704622-DZ'))
+    return sete

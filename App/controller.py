@@ -45,16 +45,23 @@ def initAnalyzer():
 #  de datos en los modelos
 # ___________________________________________________
 
-def loadCables(analyzer, LPfile, connectionsfile):
+def loadCables(analyzer, LPfile, connectionsfile, countriesfile):
     LPfile = cf.data_dir + LPfile
     LPDict = csv.DictReader(open(LPfile, encoding= "utf-8"), delimiter=",")
     connectionsfile = cf.data_dir + connectionsfile
     connectionsDict = csv.DictReader(open(connectionsfile, encoding="utf-8"), delimiter=",")
+    countriesfile = cf.data_dir + countriesfile
+    countriesDict = csv.DictReader(open(countriesfile, encoding="utf-8"), delimiter=",")
 
     for point in LPDict:
         model.addLP(analyzer, point)
     for cable in connectionsDict:
         model.addConnections(analyzer, cable)
+    for country in countriesDict:
+        model.addCountries(analyzer, country)
+        model.addLPToCapital(analyzer, country)
+
+    model.addLpConnections(analyzer)
     return analyzer
 
 def totalVertices(analyzer):
@@ -76,3 +83,12 @@ def areConnectedLP(analyzer, lp1, lp2):
 
 def criticalPoints(analyzer):
     return model.criticalPoints(analyzer)
+
+def getMinimumDistance(analyzer, p1,p2):
+    return model.getMinimumDistance(analyzer, p1,p2)
+
+
+
+
+def op1(analyzer):
+    return model.op1(analyzer)
