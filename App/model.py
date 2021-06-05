@@ -180,8 +180,20 @@ def areConnected(analyzer, lp1, lp2):
         return 0
 
 def areConnectedLP(analyzer, lp1,lp2):
-    listLp1 = me.getValue(mp.get(analyzer['lpVertices'], lp1))
-    listLp2 = me.getValue(mp.get(analyzer['lpVertices'], lp2))
+    keys = mp.keySet(analyzer['landingPoints'])
+    for key in lt.iterator(keys):
+        val = me.getValue(mp.get(analyzer['landingPoints'], key))
+        name = (((val['name']).split(','))[0]).lower()
+        if name == lp1.lower():
+            lpId1 = val['landing_point_id']
+    for key in lt.iterator(keys):
+        val = me.getValue(mp.get(analyzer['landingPoints'], key))
+        name = (((val['name']).split(','))[0]).lower()
+        if name == lp2.lower():
+            lpId2 = val['landing_point_id']
+
+    listLp1 = me.getValue(mp.get(analyzer['lpVertices'], lpId1))
+    listLp2 = me.getValue(mp.get(analyzer['lpVertices'], lpId2))
     for vertex in lt.iterator(listLp1):
         for vertex1 in lt.iterator(listLp2):
             if areConnected(analyzer, vertex, vertex1) == 1:

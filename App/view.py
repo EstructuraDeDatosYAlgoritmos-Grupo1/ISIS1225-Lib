@@ -109,8 +109,8 @@ def thread_cycle():
 
         elif int(inputs[0]) == 3:
             print("Ingrese los landing points que desea evaluar: ")
-            lp1 = input('Ingrese el id de un landing point: ')
-            lp2 = input('Ingrese el id de otro landing point: ')
+            lp1 = input('Ingrese el nombre de un landing point: ')
+            lp2 = input('Ingrese el nombre de otro landing point: ')
             optionThree(analyzer, lp1, lp2)
 
         elif int(inputs[0]) == 4:
