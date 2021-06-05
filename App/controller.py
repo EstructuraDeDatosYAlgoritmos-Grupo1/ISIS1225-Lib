@@ -87,8 +87,9 @@ def criticalPoints(analyzer):
 def getMinimumDistance(analyzer, p1,p2):
     return model.getMinimumDistance(analyzer, p1,p2)
 
+def getMinimumSpaningTree(analyzer):
+    return model.getMinimumSpaningTree(analyzer)
 
+def failureEffect(analyzer, lp):
+    return model.failureEffect(analyzer, lp)
 
-
-def op1(analyzer):
-    return model.op1(analyzer)

@@ -51,8 +51,8 @@ def printMenu():
     print("3- Identificar clusteres de comunicacion")
     print("4- Encontrar los landing points que sirven como punto de interconexión")
     print("5- Encontrar ruta mínima entre países")
-    print("6- ")
-    print("7- ")
+    print("6- Identificar red de expansión mínima")
+    print("7- Impacto de falla de un landing point ")
     print("0- Salir")
     print("*******************************************")
 
@@ -79,6 +79,13 @@ def optionFour(analyzer):
 
 def optionFive(analyzer, p1,p2):
     return controller.getMinimumDistance(analyzer, p1,p2)
+
+def optionSix(analyzer):
+    return controller.getMinimumSpaningTree(analyzer)
+
+def optionSeven(analyzer, lp):
+    return controller.failureEffect(analyzer, lp)
+
    
 
 
@@ -116,10 +123,11 @@ def thread_cycle():
             optionFive(analyzer, p1,p2)
 
         elif int(inputs[0]) == 6:
-            return controller.op1(analyzer)
-
+            optionSix(analyzer)
+            
         elif int(inputs[0]) == 7:
-            pass
+            lp = input('Ìngrese el nombre del landing point que desea evaluar: ')
+            optionSeven(analyzer, lp)
 
         else:
             sys.exit(0)

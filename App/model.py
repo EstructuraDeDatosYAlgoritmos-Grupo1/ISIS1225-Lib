@@ -25,16 +25,19 @@
  """
 
 
+from posixpath import split
 from App import config as cf
 import math
-from DISClib.ADT.graph import gr
+from DISClib.ADT.graph import adjacents, gr
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Algorithms.Graphs import prim as prim
 from DISClib.Algorithms.Sorting import mergesort as merge
 from DISClib.Utils import error as error
+from DISClib.ADT import orderedmap as om
 assert cf
 
 # =====================================================
@@ -227,6 +230,52 @@ def getCapitalCityCoordenates(analyzer, country):
     latitude = float(country['CapitalLatitude'])
     longitude = float(country ['CapitalLongitude'])
     return latitude, longitude
+
+def getMinimumSpaningTree(analyzer):
+    mst = prim.PrimMST(analyzer['connections'])
+    distance = 0
+    numberOfElements = lt.size(mp.valueSet(mst['marked']))
+    for element in lt.iterator(mp.valueSet(mst['distTo'])):
+        distance = distance + float(element)
+    print ('La cantidad de elementos es: ' + str(numberOfElements) + ' la distancia total es ' + str(distance))
+    return mst
+
+def failureEffect(analyzer, lp):
+    listOfAdjasents = lt.newList(cmpfunction=compareLandingPointIds)
+    listOfCountries = lt.newList(cmpfunction=compareLandingPointIds)
+
+    keys = mp.keySet(analyzer['landingPoints'])
+    for key in lt.iterator(keys):
+        val = me.getValue(mp.get(analyzer['landingPoints'], key))
+        name = (((val['name']).split(','))[0]).lower()
+        if name == lp.lower():
+            lpId = val['landing_point_id']
+
+    verteces= me.getValue(mp.get(analyzer['lpVertices'], lpId))
+    for vertex in lt.iterator(verteces):
+       adjasents = gr.adjacents(analyzer['connections'], vertex)
+       for element in lt.iterator(adjasents):
+           lt.addLast(listOfAdjasents, element)
+    for element in lt.iterator(listOfAdjasents):
+        element = element.split('-')
+        val = mp.get(analyzer['landingPoints'], element[0])
+        if val != None:
+           value = me.getValue(val)
+           country = ((value['name']).split(','))[1]
+           if len((value['name']).split(',')) == 3:
+               country = ((value['name']).split(','))[2]
+           if country not in lt.iterator(listOfCountries):
+              lt.addLast(listOfCountries,country)
+
+    print('\n')
+    print('Hay '+ str(lt.size(listOfCountries)) + ' paises afectados \n')
+    for element in lt.iterator(listOfCountries):
+        print(str(element))
+
+    return listOfCountries
+
+   
+           
     
 
 
@@ -331,9 +380,3 @@ def compareLandingPointIds(stop, keyValueLP):
     else:
         return -1
 
-
-def op1(analyzer):
-    sete = gr.containsVertex(analyzer['connections'],'3316-2africa')
-    print(sete)
-    print(gr.containsVertex(analyzer['connections'],'19704622-DZ'))
-    return sete
