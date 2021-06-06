@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.DataStructures.edge import weight
 from posixpath import split
 from App import config as cf
 import math
@@ -108,9 +109,6 @@ def addConnections(analyzer, cable):
 
     addLpVertices(analyzer, cable, "\ufefforigin", origin)
     addLpVertices(analyzer, cable, "destination", destination)
-
-
-    #addLpConnections(analyzer)
     
     return analyzer
 
@@ -121,7 +119,6 @@ def addConnections(analyzer, cable):
 
 def addLP(analyzer, point):
     mp.put(analyzer["landingPoints"],point["landing_point_id"], point)
-
     return analyzer
 
 def addCable(analyzer,cable):
@@ -137,6 +134,21 @@ def addLPToCapital(analyzer, country):
     if not gr.containsVertex(analyzer['connections'], vertexid):
        gr.insertVertex(analyzer['connections'], vertexid)
     keys = mp.keySet(analyzer["landingPoints"])
+
+    cName = str(country['CapitalName'])+','+str(country['CountryName'])
+    lp = {'landing_point_id':country['Internet users'], 'id': country['Internet users'], 'name': str(cName), 'latitude':country['CapitalLatitude'] , 'longitude':country['CapitalLongitude']}
+    if not mp.contains(analyzer["landingPoints"],country['Internet users']):
+       mp.put(analyzer['landingPoints'], country['Internet users'], lp)
+
+    existsEntry = mp.get(analyzer["lpVertices"], country['Internet users'])
+    if existsEntry == None:
+        dataentry = lt.newList('ARRAY_LIST', compareLandingPointIds)
+        mp.put(analyzer["lpVertices"],country['Internet users'], dataentry)
+    else:
+        dataentry = me.getValue(existsEntry)
+    lt.addLast(dataentry, vertexid)
+
+
     for key in lt.iterator(keys):
         name = (me.getValue(mp.get(analyzer["landingPoints"],key)))['name']
         if country['CountryName'] in name:
@@ -144,13 +156,13 @@ def addLPToCapital(analyzer, country):
             if not gr.containsVertex(analyzer['connections'], destinationName):
                 gr.insertVertex(analyzer['connections'], destinationName)
             existsEntry = mp.get(analyzer["lpVertices"], key)
-            dataentry = me.getValue(existsEntry)
-            lt.addLast(dataentry, destinationName)
-            origin = getCapitalCityCoordenates(analyzer, country)
-            destination = getCoordinates(analyzer, key)
-            distance = haversine(origin[0], origin[1], destination[0], destination[1])
-            addConnection(analyzer, vertexid, destinationName, distance)
-
+            if existsEntry != None:
+              dataentry = me.getValue(existsEntry)
+              lt.addLast(dataentry, destinationName)
+              origin = getCapitalCityCoordenates(analyzer, country)
+              destination = getCoordinates(analyzer, key)
+              distance = haversine(origin[0], origin[1], destination[0], destination[1])
+              addConnection(analyzer, vertexid, destinationName, distance)
     return analyzer
     
     
@@ -170,11 +182,9 @@ def connectedComponents(analyzer):
     return scc.connectedComponents(analyzer['components'])
 
 def areConnected(analyzer, lp1, lp2):
-    analyzer['paths'] = djk.Dijkstra(analyzer['connections'], lp1)
-    lp1HasPath = djk.hasPathTo(analyzer['paths'], lp2)
-    analyzer['paths'] = djk.Dijkstra(analyzer['connections'], lp2)
-    lp2HasPath = djk.hasPathTo(analyzer['paths'], lp1)
-    if lp1HasPath and lp2HasPath:
+    analyzer['components'] = scc.KosarajuSCC(analyzer['connections'])
+    connected = scc.stronglyConnected(analyzer['components'], lp1, lp2)
+    if connected:
         return 1
     else:
         return 0
@@ -222,6 +232,7 @@ def criticalPoints(analyzer):
           + str(criticalPoint['name']) + ' Cantidad de cables conectados:  ' + str(max))
     return criticalPoint
 
+
 def getMinimumDistance(analyzer, p1,p2):
     c1 = me.getValue(mp.get(analyzer['countries'],p1))
     c2 = me.getValue(mp.get(analyzer['countries'],p2))
@@ -255,6 +266,7 @@ def getMinimumSpaningTree(analyzer):
 def failureEffect(analyzer, lp):
     listOfAdjasents = lt.newList(cmpfunction=compareLandingPointIds)
     listOfCountries = lt.newList(cmpfunction=compareLandingPointIds)
+    listOfCountriesF = lt.newList(cmpfunction=cmpCountries)
 
     keys = mp.keySet(analyzer['landingPoints'])
     for key in lt.iterator(keys):
@@ -268,6 +280,7 @@ def failureEffect(analyzer, lp):
        adjasents = gr.adjacents(analyzer['connections'], vertex)
        for element in lt.iterator(adjasents):
            lt.addLast(listOfAdjasents, element)
+       
     for element in lt.iterator(listOfAdjasents):
         element = element.split('-')
         val = mp.get(analyzer['landingPoints'], element[0])
@@ -277,19 +290,33 @@ def failureEffect(analyzer, lp):
            if len((value['name']).split(',')) == 3:
                country = ((value['name']).split(','))[2]
            if country not in lt.iterator(listOfCountries):
-              lt.addLast(listOfCountries,country)
+              lt.addLast(listOfCountries,(country,getDistanceLps(analyzer, lpId, element[0])))
 
-    print('\n')
-    print('Hay '+ str(lt.size(listOfCountries)) + ' paises afectados \n')
+    auxLst = lt.newList(cmpfunction=compareLandingPointIds)
+    listOfCountries = merge.sort(listOfCountries, cmpCountries)
     for element in lt.iterator(listOfCountries):
-        print(str(element))
-
-    return listOfCountries
-
-   
-           
+        if ((element[0]).lower()).strip() not in lt.iterator(auxLst):
+            lt.addLast(auxLst, ((element[0]).lower()).strip())
+            lt.addLast(listOfCountriesF, element)
     
 
+    print('\n')
+    print('Hay '+ str(lt.size(listOfCountriesF)) + ' paises afectados \n')
+    for element in lt.iterator(listOfCountriesF):
+        print(str(element[0])+ ' a '+str(element[1])+ ' km de distancia')
+    return listOfCountriesF
+
+
+def getDistanceLps(analyzer, lp1, lp2):
+    lp1 = me.getValue(mp.get(analyzer['landingPoints'],lp1))
+    lp2 = me.getValue(mp.get(analyzer['landingPoints'],lp2))
+    dist = haversine(float(lp1['latitude']), float(lp1['longitude']), float(lp2['latitude']), float(lp2['longitude']))
+    return dist
+   
+
+    
+
+       
 
 
 # ==============================
@@ -391,4 +418,12 @@ def compareLandingPointIds(stop, keyValueLP):
         return 1
     else:
         return -1
+
+def cmpCountries(ct1,ct2):
+    ct1 = ct1[1]
+    ct2 = ct2[1]
+    return (float(ct1) > float(ct2))
+
+
+        
 

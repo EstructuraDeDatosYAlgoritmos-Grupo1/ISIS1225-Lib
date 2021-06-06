@@ -126,7 +126,7 @@ def thread_cycle():
             optionSix(analyzer)
             
         elif int(inputs[0]) == 7:
-            lp = input('Ìngrese el nombre del landing point que desea evaluar: ')
+            lp = input('Ingrese el nombre del landing point que desea evaluar: ')
             optionSeven(analyzer, lp)
 
         else:
