@@ -127,7 +127,7 @@ def addCable(analyzer,cable):
         mp.put(analyzer["cables"], cable["cable_id"], cable["capacityTBPS"])
 
 def addCountries(analyzer, country):
-    mp.put(analyzer["countries"],country["CountryName"], country)
+    mp.put(analyzer["countries"],(country["CountryName"]).lower(), country)
 
 def addLPToCapital(analyzer, country):
     vertexid = str(country['Internet users'])+'-'+ str(country['CountryCode'])
@@ -212,30 +212,41 @@ def areConnectedLP(analyzer, lp1,lp2):
     return 0
 
 def criticalPoints(analyzer):
-    criticalPoint = None
+    criticalPoints = lt.newList(cmpfunction=None)
     max = 0
-    keyCritical = 0
     keys = mp.keySet(analyzer['lpVertices'])
     for key in lt.iterator(keys):
        value = me.getValue(mp.get(analyzer['lpVertices'], key))
-       lstVal = list(set(value['elements']))
-       lstAux = lt.newList('ARRAY_LIST', compareLandingPointIds)
-       for element in lstVal:
-            lt.addLast(lstAux, element)
-       size = lt.size(lstAux)
+       auxlst = eliminateRepeated(value)
+       size = lt.size(auxlst)
        if size > max :
           max = size
-          criticalPoint = me.getValue(mp.get(analyzer['landingPoints'], key))
-          keyCritical = key
-    print('\n El landing point con mas cables conectados es: \n' )      
-    print('ID: '+ str(keyCritical) + ' Nombre: ' + str(criticalPoint['id']) + ' Ubicación: ' 
-          + str(criticalPoint['name']) + ' Cantidad de cables conectados:  ' + str(max))
+    for key in lt.iterator(keys):
+       value = me.getValue(mp.get(analyzer['lpVertices'], key))
+       auxlst = eliminateRepeated(value)
+       size = lt.size(auxlst)
+       if size == max :
+           criticalPoint = me.getValue(mp.get(analyzer['landingPoints'], key))
+           lt.addLast(criticalPoints,(criticalPoint,key))
+    
+    for element in lt.iterator(criticalPoints):
+      print('\n Los landing points con mas cables conectados son: \n' )      
+      print('ID: '+ str(element[1]) + ' Nombre: ' + str((element[0])['id']) + ' Ubicación: ' 
+          + str((element[0])['name']) + ' Cantidad de cables conectados:  ' + str(max))
     return criticalPoint
+
+def eliminateRepeated(lst):
+    auxlst = lt.newList(cmpfunction=None)
+    for element in lt.iterator(lst):
+        if not lt.isPresent(auxlst,element):
+            lt.addLast(auxlst,element)
+    return auxlst
+
 
 
 def getMinimumDistance(analyzer, p1,p2):
-    c1 = me.getValue(mp.get(analyzer['countries'],p1))
-    c2 = me.getValue(mp.get(analyzer['countries'],p2))
+    c1 = me.getValue(mp.get(analyzer['countries'],p1.lower()))
+    c2 = me.getValue(mp.get(analyzer['countries'],p2.lower()))
     v1 = str(c1['Internet users'])+'-'+ str(c1['CountryCode'])
     v2 = str(c2['Internet users'])+'-'+ str(c2['CountryCode'])
     analyzer['paths'] = djk.Dijkstra(analyzer['connections'], v1)
