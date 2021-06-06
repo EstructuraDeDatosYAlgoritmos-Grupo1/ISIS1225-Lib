@@ -127,7 +127,7 @@ def addCable(analyzer,cable):
         mp.put(analyzer["cables"], cable["cable_id"], cable["capacityTBPS"])
 
 def addCountries(analyzer, country):
-    mp.put(analyzer["countries"],country["CountryName"], country)
+    mp.put(analyzer["countries"],(country["CountryName"]).lower(), country)
 
 def addLPToCapital(analyzer, country):
     vertexid = str(country['Internet users'])+'-'+ str(country['CountryCode'])
@@ -245,8 +245,8 @@ def eliminateRepeated(lst):
 
 
 def getMinimumDistance(analyzer, p1,p2):
-    c1 = me.getValue(mp.get(analyzer['countries'],p1))
-    c2 = me.getValue(mp.get(analyzer['countries'],p2))
+    c1 = me.getValue(mp.get(analyzer['countries'],p1.lower()))
+    c2 = me.getValue(mp.get(analyzer['countries'],p2.lower()))
     v1 = str(c1['Internet users'])+'-'+ str(c1['CountryCode'])
     v2 = str(c2['Internet users'])+'-'+ str(c2['CountryCode'])
     analyzer['paths'] = djk.Dijkstra(analyzer['connections'], v1)
