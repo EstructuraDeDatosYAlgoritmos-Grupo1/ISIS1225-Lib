@@ -107,7 +107,7 @@ def addConnections(analyzer, cable):
 
     addCable(analyzer,cable)
 
-    addLpVertices(analyzer, cable, "\ufefforigin", origin)
+    addLpVertices(analyzer, cable, "origin", origin)
     addLpVertices(analyzer, cable, "destination", destination)
     
     return analyzer
@@ -324,7 +324,7 @@ def getDistanceLps(analyzer, lp1, lp2):
 # ==============================
 
 def formatVertexOrigin(cable):
-    name = str(cable['\ufefforigin']) + '-'
+    name = str(cable['origin']) + '-'
     name = name + str(cable['cable_id'])
     return name
 
@@ -334,7 +334,7 @@ def formatVertexDestination(cable):
     return name
 
 def formatDistance(cable, analyzer):
-    origin = cable["\ufefforigin"]
+    origin = cable["origin"]
     destination = cable["destination"]
     coordinatesOrigin = getCoordinates(analyzer, origin)
     coordinatesDestination = getCoordinates(analyzer,destination)
