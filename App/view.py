@@ -19,7 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-
+import time
+import tracemalloc
 import sys
 import config
 import threading
@@ -87,7 +88,36 @@ def optionSeven(analyzer, lp):
     return controller.failureEffect(analyzer, lp)
 
    
+#Funciones para la toma del tiempo y memoria
 
+def getTime():
+    """
+    devuelve el instante tiempo de procesamiento en milisegundos
+    """
+    return float(time.perf_counter()*1000)
+
+
+def getMemory():
+    """
+    toma una muestra de la memoria alocada en instante de tiempo
+    """
+    return tracemalloc.take_snapshot()
+
+
+def deltaMemory(start_memory, stop_memory):
+    """
+    calcula la diferencia en memoria alocada del programa entre dos
+    instantes de tiempo y devuelve el resultado en bytes (ej.: 2100.0 B)
+    """
+    memory_diff = stop_memory.compare_to(start_memory, "filename")
+    delta_memory = 0.0
+
+    # suma de las diferencias en uso de memoria
+    for stat in memory_diff:
+        delta_memory = delta_memory + stat.size_diff
+    # de Byte -> kByte
+    delta_memory = delta_memory/1024.0
+    return delta_memory
 
 
 
@@ -111,27 +141,99 @@ def thread_cycle():
             print("Ingrese los landing points que desea evaluar: ")
             lp1 = input('Ingrese el nombre de un landing point: ')
             lp2 = input('Ingrese el nombre de otro landing point: ')
+
+            delta_time = -1.0
+            delta_memory = -1.0
+            tracemalloc.start()
+            start_time = getTime()
+            start_memory = getMemory()
+
             optionThree(analyzer, lp1, lp2)
 
+            stop_memory = getMemory()
+            stop_time = getTime()
+            tracemalloc.stop()
+            delta_time = stop_time - start_time
+            delta_memory = deltaMemory(start_memory, stop_memory)
+            print(delta_time,delta_memory)
+
         elif int(inputs[0]) == 4:
-           optionFour(analyzer)
+            
+            delta_time = -1.0
+            delta_memory = -1.0
+            tracemalloc.start()
+            start_time = getTime()
+            start_memory = getMemory()
+
+            optionFour(analyzer)
+
+            stop_memory = getMemory()
+            stop_time = getTime()
+            tracemalloc.stop()
+            delta_time = stop_time - start_time
+            delta_memory = deltaMemory(start_memory, stop_memory)
+            print(delta_time,delta_memory)
             
         elif int(inputs[0]) == 5:
             print("Ingrese los países que desea evaluar ")
             p1 = input('Ingrese el nombre del primer país: ')
             p2 = input('Ingrese el nombre del segundo país: ')
+
+            delta_time = -1.0
+            delta_memory = -1.0
+            tracemalloc.start()
+            start_time = getTime()
+            start_memory = getMemory()
+
             optionFive(analyzer, p1,p2)
 
+            stop_memory = getMemory()
+            stop_time = getTime()
+            tracemalloc.stop()
+            delta_time = stop_time - start_time
+            delta_memory = deltaMemory(start_memory, stop_memory)
+            print(delta_time,delta_memory)
+
         elif int(inputs[0]) == 6:
+
+            delta_time = -1.0
+            delta_memory = -1.0
+            tracemalloc.start()
+            start_time = getTime()
+            start_memory = getMemory()
+
             optionSix(analyzer)
+
+            stop_memory = getMemory()
+            stop_time = getTime()
+            tracemalloc.stop()
+            delta_time = stop_time - start_time
+            delta_memory = deltaMemory(start_memory, stop_memory)
+            print(delta_time,delta_memory)
             
         elif int(inputs[0]) == 7:
             lp = input('Ingrese el nombre del landing point que desea evaluar: ')
+
+            delta_time = -1.0
+            delta_memory = -1.0
+            tracemalloc.start()
+            start_time = getTime()
+            start_memory = getMemory()
+
             optionSeven(analyzer, lp)
+
+            stop_memory = getMemory()
+            stop_time = getTime()
+            tracemalloc.stop()
+            delta_time = stop_time - start_time
+            delta_memory = deltaMemory(start_memory, stop_memory)
+            print(delta_time,delta_memory)
 
         else:
             sys.exit(0)
     sys.exit(0)
+
+    
 
 
 if __name__ == "__main__":
